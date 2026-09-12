@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.conda/
+.env/
+data/
+outputs/
+.DS_Store
