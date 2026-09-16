@@ -1,6 +1,6 @@
 \documentclass[10pt,a4paper]{article}
 
-\usepackage[margin=1.7cm]{geometry}
+\usepackage[margin=1.55cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
@@ -8,89 +8,82 @@
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{enumitem}
 
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0.35em}
+\setlength{\parskip}{0.28em}
 \setlist[itemize]{nosep,leftmargin=*}
 
-% Compile even if a figure has not been generated yet.
-% Usage: \labfigure{0.42}{outputs/ae_reconstructions.png}{Caption}
 \newcommand{\labfigure}[3]{%
   \begin{figure}[H]
     \centering
-    \IfFileExists{#2}{%
-      \includegraphics[width=#1\linewidth]{#2}%
-    }{%
-      \fbox{\parbox[c][2.4cm][c]{0.8\linewidth}{\centering Missing figure: \texttt{\detokenize{#2}}}}%
-    }
+    \IfFileExists{#2}{\includegraphics[width=#1\linewidth,height=3.0cm,keepaspectratio]{#2}}{%
+      \fbox{\parbox[c][2.0cm][c]{0.82\linewidth}{\centering Missing figure: \texttt{\detokenize{#2}}}}}
     \caption{#3}
   \end{figure}
 }
 
-\newcommand{\answer}{\textit{Write your answer here.}}
+\newcommand{\twolabfigures}[5]{%
+  \begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\linewidth}\centering
+      \IfFileExists{#1}{\includegraphics[width=\linewidth,height=3.0cm,keepaspectratio]{#1}}{\fbox{\parbox[c][2.0cm][c]{0.92\linewidth}{\centering Missing: \texttt{\detokenize{#1}}}}}
+      \\[-0.1em]{\small #2}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\linewidth}\centering
+      \IfFileExists{#3}{\includegraphics[width=\linewidth,height=3.0cm,keepaspectratio]{#3}}{\fbox{\parbox[c][2.0cm][c]{0.92\linewidth}{\centering Missing: \texttt{\detokenize{#3}}}}}
+      \\[-0.1em]{\small #4}
+    \end{minipage}
+    \caption{#5}
+  \end{figure}
+}
+
+\newcommand{\answer}{\textit{Write a concise answer here.}}
 
 \begin{document}
 
 \begin{center}
-  {\Large\bfseries VAE Practical Lab -- Short Report}\\[0.4em]
+  {\Large\bfseries VAE Practical Lab -- Short Report}\\[0.3em]
   \textbf{Name:} Your name \hfill
   \textbf{Partner (if any):} Name or none
 \end{center}
 
-\vspace{0.3em}
-\noindent\textbf{Maximum length: 2 pages, including figures.}
+\noindent\textbf{Maximum length: 2 pages, including figures. Keep answers concise.}
 
-\section*{1. Autoencoder}
+\section*{1. Autoencoder and latent GMM}
 
-% Replace the filename if needed.
-\labfigure{0.42}{outputs/ae_reconstructions.png}{Autoencoder reconstructions.}
+\labfigure{0.34}{outputs/ae_reconstructions.png}{Autoencoder inputs and reconstructions.}
 
-\textbf{Q1.} Why can the AE reconstruct well but generate poorly when $z\sim\mathcal N(0,I)$?
+\textbf{Q1.} Compare the reconstructions and samples from $z\sim\mathcal N(0,I_2)$. Why is this Gaussian not necessarily a good model of the latent codes learned by the autoencoder?
 
 \answer
 
-\section*{2. GMM in the AE latent space}
+\twolabfigures{outputs/ae_normal_samples.png}{$z\sim\mathcal N(0,I)$}{outputs/ae_gmm_samples.png}{$z\sim p_{\mathrm{GMM}}$}{Samples obtained with the same AE decoder and two latent sampling distributions.}
 
-% You may replace this by a single side-by-side figure if you prefer.
-\labfigure{0.38}{outputs/ae_gmm_samples.png}{Samples obtained after fitting a GMM in the AE latent space.}
-
-\textbf{Q2.} Why does the fitted GMM usually provide better latent samples?
+\textbf{Q2.} Why can the fitted GMM produce more meaningful samples?
 
 \answer
 
-\textbf{Q3.} In what sense is GMM + decoder a generative model?
+\newpage
+\section*{2. Variational autoencoder}
+
+\textbf{Q3.} What is the role of the KL term? Why would forcing $q_\phi(z\mid x)=\mathcal N(0,I)$ exactly for every input $x$ be undesirable?
 
 \answer
 
-\section*{3. Variational autoencoder}
-
-% Keep only the most informative figures to remain within two pages.
-\labfigure{0.36}{outputs/vae_latent.png}{VAE latent representation.}
-
-\textbf{Q4.} What is the role of the KL term? What changes compared with the AE latent space?
+\textbf{Q4.} Why do we use the reparameterization $z=\mu+\sigma\varepsilon$ instead of directly sampling $z\sim q_\phi(z\mid x)$ inside the network?
 
 \answer
 
-\textbf{Q5.} Why is the reparameterization trick needed for gradient-based training?
+\twolabfigures{outputs/vae_latent.png}{VAE latent means}{outputs/vae_prior_samples.png}{VAE prior samples}{VAE latent representation and generated samples.}
+
+\section*{3. Comparison}
+
+\textbf{Q5.} Is the VAE better than AE+GMM in your experiment? Explain why or why not. What is the conceptual advantage of the VAE approach? Suggest one concrete change that you would try to improve the generated images.
 
 \answer
 
-\section*{4. Exploring the latent space}
-
-% Choose either the latent grid or the interpolation figure.
-\labfigure{0.38}{outputs/vae_latent_grid.png}{Exploration of the learned VAE latent space.}
-
-\textbf{Q6.} Describe one qualitative property of the VAE latent space that is useful for generation.
-
-\answer
-
-\section*{Optional -- beta experiment}
-
-If you tried several values of $\beta$, briefly describe the observed reconstruction/generation trade-off.
-
-% Optional answer here.
+\paragraph{Optional $\beta$ experiment.} If performed, summarize the reconstruction/generation trade-off in one or two sentences.
 
 \end{document}
